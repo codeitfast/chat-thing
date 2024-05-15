@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple WebSocket Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #chat {
+      width: 80%;
+      max-width: 600px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+    #input {
+      display: flex;
+    }
+    #input input {
+      flex: 1;
+      padding: 5px;
+    }
+    #input button {
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat">
+    <div id="messages"></div>
+    <div id="input">
+      <input type="text" id="message" placeholder="Type a message">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const ws = new WebSocket('ws://localhost:8080');
+    const messagesDiv = document.getElementById('messages');
+    const messageInput = document.getElementById('message');
+
+    ws.onopen = () => {
+      addMessage('Connected to WebSocket server');
+    };
+
+    ws.onmessage = (event) => {
+      addMessage('Received: ' + event.data);
+    };
+
+    ws.onclose = () => {
+      addMessage('Disconnected from WebSocket server');
+    };
+
+    function sendMessage() {
+      const message = messageInput.value;
+      if (message) {
+        ws.send(message);
+        addMessage('Sent: ' + message);
+        messageInput.value = '';
+      }
+    }
+
+    function addMessage(message) {
+      const messageElement = document.createElement('div');
+      messageElement.textContent = message;
+      messagesDiv.appendChild(messageElement);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+  </script>
+</body>
+</html>
